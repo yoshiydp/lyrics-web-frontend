@@ -95,18 +95,25 @@ yarn dev
 lyrics-web-frontend/
 ├── src/
 │   ├── app/                   # App Router ルート
-│   │   ├── layout.tsx          # ルートレイアウト
-│   │   ├── page.tsx            # トップページ (/)
+│   │   ├── layout.tsx          # ルートレイアウト（Qwigley フォント登録）
+│   │   ├── page.tsx            # トップページ (/) ・キービジュアル
 │   │   ├── globals.css         # グローバルスタイル・shadcn/ui CSS 変数
 │   │   └── news/
 │   │       ├── page.tsx        # ニュース一覧 (/news)
 │   │       └── [slug]/
 │   │           └── page.tsx    # ニュース詳細 (/news/[slug])
 │   ├── components/
+│   │   ├── canvas/            # WebGL キービジュアル（react-three-fiber）
+│   │   │   ├── GlitchCanvasLoader.tsx
+│   │   │   ├── GlitchCanvas.tsx
+│   │   │   ├── GlitchScene.tsx
+│   │   │   └── shaders.ts
 │   │   └── ui/                # shadcn/ui コンポーネント（npx shadcn add で追加）
 │   ├── lib/
 │   │   └── utils.ts           # cn() ユーティリティ
-│   └── hooks/                 # カスタムフック
+│   ├── hooks/                 # カスタムフック
+│   └── types/
+│       └── glsl.d.ts          # .glsl ファイル型定義
 ├── components.json            # shadcn/ui 設定
 ├── .env.local                 # 環境変数（gitignore 済み）
 ├── .env.local.example         # 環境変数テンプレート
@@ -192,6 +199,89 @@ import { SomeComponent } from '@/components/SomeComponent';
 ## スタイリング
 
 Tailwind CSS v4 を使用します。`src/app/globals.css` に `@import "tailwindcss"` が設定されています。
+
+---
+
+## WebGL キービジュアル（react-three-fiber）
+
+### 概要
+
+ホームページのキービジュアルに **react-three-fiber (R3F v9 RC)** + **GLSL カスタムシェーダー** を使用しています。
+Next.js 16 + React 19 の組み合わせには R3F v8 が非対応のため、v9 RC を使用しています。
+
+### 関連パッケージ
+
+| パッケージ | バージョン | 用途 |
+|----------|----------|------|
+| `three` | 0.185.0 | WebGL コアライブラリ |
+| `@react-three/fiber` | 9.0.0-rc.10 | React 19 対応の R3F |
+| `@react-three/drei` | 10.7.7 | ユーティリティ集 |
+| `@types/three` | 0.185.0 | 型定義 |
+
+### ファイル構成
+
+```
+src/components/canvas/
+├── GlitchCanvasLoader.tsx  # SSR 無効の動的インポートラッパー（'use client'）
+├── GlitchCanvas.tsx        # R3F <Canvas> ラッパー
+├── GlitchScene.tsx         # シェーダー Mesh + useFrame アニメーション
+├── shaders.ts              # GLSL 頂点・フラグメントシェーダー（文字列エクスポート）
+├── glitch.vert.glsl        # 頂点シェーダー（参考用）
+└── glitch.frag.glsl        # フラグメントシェーダー（参考用）
+
+src/types/
+└── glsl.d.ts               # .glsl ファイルの TypeScript 型定義
+```
+
+### シェーダーの表現内容
+
+| レイヤー | 表現 |
+|---------|------|
+| 同心円ウェーブリング | mid / treble のサイン波で広がる波紋 |
+| 水平ウェーブフォーム | 複数の無理数比速度を持つサインハーモニクス（数百秒リピートなし） |
+| グリッチブロック | ランダムな水平ズレ・バースト |
+| RGB 色収差 | クロマティックアベレーション |
+| ビネット | 周辺減光 |
+
+**カラー**: lyrics-mobile パレットの purple `#6C3483` + gold `#FFD700` を使用。
+
+### フルスクリーン対応
+
+頂点シェーダーで **クリップ空間直接出力** を使用し、カメラ・FOV・アスペクト比をバイパスします。
+
+```glsl
+/* クリップ空間直接出力 — アスペクト比に依存しない */
+gl_Position = vec4(position.xy, 0.0, 1.0);
+```
+
+ウィンドウリサイズ時は R3F の `resize={{ debounce: 0 }}` + `useFrame` 内の `uResolution` 更新で即時対応します。
+
+### Next.js 設定
+
+`next.config.ts` に `transpilePackages: ["three"]` が必要です（ESM/CJS 混在の解決）。
+
+```typescript
+const nextConfig: NextConfig = {
+  transpilePackages: ["three"],
+};
+```
+
+### コンポーネントの使い方
+
+```tsx
+// Server Component から使用する場合は GlitchCanvasLoader を使う
+// （ssr: false は Server Component に置けないため）
+import GlitchCanvasLoader from "@/components/canvas/GlitchCanvasLoader";
+
+<section className="relative h-screen w-full overflow-hidden">
+  <GlitchCanvasLoader />
+</section>
+```
+
+### フォント
+
+ロゴ "Lyrics" には Google Fonts の **Qwigley**（筆記体）を使用しています。
+`layout.tsx` で `next/font/google` から読み込み、`--font-qwigley` CSS 変数として提供しています。
 
 ---
 

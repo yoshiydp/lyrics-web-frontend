@@ -25,6 +25,7 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-qwigley: var(--font-qwigley);
   --radius: var(--radius-base);
 }
 
