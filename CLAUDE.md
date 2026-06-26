@@ -31,6 +31,7 @@ yarn lint
 | フレームワーク | Next.js 16（App Router） |
 | 言語 | TypeScript |
 | スタイリング | Tailwind CSS v4 |
+| UI コンポーネント | shadcn/ui（style: base-nova） |
 | ホスティング | Vercel |
 | CMS / API | Strapi v5（lyrics-web-strapi） |
 | ランタイム | Node.js v22 |
@@ -93,19 +94,24 @@ yarn dev
 ```
 lyrics-web-frontend/
 ├── src/
-│   └── app/                  # App Router ルート
-│       ├── layout.tsx         # ルートレイアウト
-│       ├── page.tsx           # トップページ (/)
-│       ├── globals.css        # グローバルスタイル（Tailwind）
-│       └── news/
-│           ├── page.tsx       # ニュース一覧 (/news)
-│           └── [slug]/
-│               └── page.tsx   # ニュース詳細 (/news/[slug])
+│   ├── app/                   # App Router ルート
+│   │   ├── layout.tsx          # ルートレイアウト
+│   │   ├── page.tsx            # トップページ (/)
+│   │   ├── globals.css         # グローバルスタイル・shadcn/ui CSS 変数
+│   │   └── news/
+│   │       ├── page.tsx        # ニュース一覧 (/news)
+│   │       └── [slug]/
+│   │           └── page.tsx    # ニュース詳細 (/news/[slug])
+│   ├── components/
+│   │   └── ui/                # shadcn/ui コンポーネント（npx shadcn add で追加）
+│   ├── lib/
+│   │   └── utils.ts           # cn() ユーティリティ
+│   └── hooks/                 # カスタムフック
+├── components.json            # shadcn/ui 設定
 ├── .env.local                 # 環境変数（gitignore 済み）
 ├── .env.local.example         # 環境変数テンプレート
 ├── next.config.ts             # Next.js 設定
-├── tsconfig.json
-└── tailwind.config.ts         # Tailwind 設定（自動生成）
+└── tsconfig.json
 ```
 
 ---
@@ -186,6 +192,62 @@ import { SomeComponent } from '@/components/SomeComponent';
 ## スタイリング
 
 Tailwind CSS v4 を使用します。`src/app/globals.css` に `@import "tailwindcss"` が設定されています。
+
+---
+
+## UI コンポーネント（shadcn/ui）
+
+### 概要
+
+shadcn/ui（style: `base-nova`、Tailwind CSS v4 対応）を採用しています。  
+コンポーネントは npm パッケージではなく**コードとしてコピーして所有**するため、`src/components/ui/` に配置されます。
+
+### コンポーネントの追加
+
+```bash
+npx shadcn@latest add button
+npx shadcn@latest add input card dialog
+```
+
+設定ファイルは `components.json`（リポジトリルート）です。
+
+### ユーティリティ
+
+`src/lib/utils.ts` に `cn()` 関数を提供しています。Tailwind クラスの合成に使います。
+
+```typescript
+import { cn } from "@/lib/utils";
+
+<div className={cn("base-class", condition && "conditional-class")} />
+```
+
+### カラーパレット
+
+`src/app/globals.css` に CSS 変数として定義されています。**lyrics-mobile（`apps/mobile/src/globalStyles/colors.ts`）のカラーを移植**しています。
+
+| CSS 変数 | 値 | モバイル参照元 |
+|---------|-----|--------------|
+| `--background` | `#0D0D0D` | `base.bgDefault` |
+| `--foreground` | `#EFEFEF` | `font.default` |
+| `--primary` / `--accent` | `#FFD700` | `accent.goldPrimary`（ゴールド） |
+| `--secondary` | `#192126` | `navigation.bg` |
+| `--muted` | `#1C1C1C` | `surface.waveform` |
+| `--destructive` | `#C1272D` | `action.record` |
+| `--border` | `#333333` | `base.borderDefault` |
+| `--input` | `#999999` | `form.default.border` |
+| `--ring` | `#FFD700` | `accent.goldPrimary` |
+
+> カラーを変更する場合は `globals.css` の `:root` ブロックのみを編集してください。`colors.ts`（モバイル側）と同期が取れているか確認してください。
+
+### 関連パッケージ
+
+| パッケージ | 用途 |
+|----------|------|
+| `clsx` + `tailwind-merge` | クラス名合成（`cn()` ユーティリティ） |
+| `class-variance-authority` | バリアント定義（`cva()`） |
+| `tw-animate-css` | Tailwind v4 向けアニメーション |
+| `lucide-react` | アイコン |
+| `@base-ui/react` | アクセシブルなプリミティブ（Dialog 等） |
 
 ---
 

@@ -1,26 +1,81 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --radius: var(--radius-base);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/*
+ * Lyrics Color Palette (ported from apps/mobile/src/globalStyles/colors.ts)
+ *
+ * base.bgDefault      #0D0D0D  → --background
+ * base.borderDefault  #333333  → --border
+ * accent.goldPrimary  #FFD700  → --primary / --accent / --ring
+ * font.default        #EFEFEF  → --foreground
+ * font.label          #666666  → --muted-foreground
+ * font.navigation     #CCCCCC  → --secondary-foreground
+ * surface.waveform    #1C1C1C  → --muted
+ * form.default.bg     #191919  → --card / --popover / --input bg
+ * form.default.border #999999  → --input (border)
+ * navigation.bg       #192126  → --secondary
+ * action.record       #C1272D  → --destructive
+ */
+:root {
+  --background: #0D0D0D;
+  --foreground: #EFEFEF;
+
+  --card: #191919;
+  --card-foreground: #EFEFEF;
+
+  --popover: #191919;
+  --popover-foreground: #EFEFEF;
+
+  --primary: #FFD700;
+  --primary-foreground: #0D0D0D;
+
+  --secondary: #192126;
+  --secondary-foreground: #CCCCCC;
+
+  --muted: #1C1C1C;
+  --muted-foreground: #666666;
+
+  --accent: #FFD700;
+  --accent-foreground: #0D0D0D;
+
+  --destructive: #C1272D;
+  --destructive-foreground: #EFEFEF;
+
+  --border: #333333;
+  --input: #999999;
+  --ring: #FFD700;
+
+  --radius-base: 0.5rem;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
