@@ -267,6 +267,16 @@ vercel env rm NEXT_PUBLIC_STRAPI_URL production             # 削除
 
 > **Strapi Cloud デプロイ後:** `staging` と `production` の `NEXT_PUBLIC_STRAPI_URL` を Strapi Cloud の各環境 URL に更新してください。
 
+```bash
+# staging 用（Strapi Cloud の STG URL に変更）
+vercel env rm NEXT_PUBLIC_STRAPI_URL preview
+echo "https://your-strapi-staging.strapiapp.com" | vercel env add NEXT_PUBLIC_STRAPI_URL preview staging
+
+# 本番用（Strapi Cloud の本番 URL に変更）
+vercel env rm NEXT_PUBLIC_STRAPI_URL production
+echo "https://your-strapi-prod.strapiapp.com" | vercel env add NEXT_PUBLIC_STRAPI_URL production
+```
+
 ### デプロイ前チェック
 
 ```bash
