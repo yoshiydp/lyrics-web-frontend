@@ -191,15 +191,47 @@ Tailwind CSS v4 を使用します。`src/app/globals.css` に `@import "tailwin
 
 ## デプロイフロー
 
-### Vercel へのデプロイ
+### Vercel プロジェクト情報
 
-`main` ブランチへのマージで Vercel が自動デプロイします。
+| 項目 | 値 |
+|------|---|
+| プロジェクト名 | `lyrics-web/lyrics-web-frontend` |
+| 本番 URL | https://lyrics-web-frontend.vercel.app |
+| ダッシュボード | https://vercel.com/lyrics-web/lyrics-web-frontend |
 
-**Vercel に設定する環境変数:**
+### 自動デプロイ
 
-| 変数名 | 説明 |
-|--------|------|
-| `NEXT_PUBLIC_STRAPI_URL` | Strapi Cloud の本番エンドポイント URL |
+GitHub リポジトリと Vercel が連携済みです。
+
+| ブランチ | デプロイ先 |
+|---------|-----------|
+| `master` | Production（本番） |
+| その他ブランチ | Preview（確認用 URL が自動発行） |
+
+### 手動デプロイ（CLI）
+
+```bash
+vercel --prod   # 本番デプロイ
+vercel          # Preview デプロイ
+```
+
+### 環境変数
+
+Vercel に登録済みの環境変数（CLI で管理）：
+
+| 変数名 | 環境 | 説明 |
+|--------|------|------|
+| `NEXT_PUBLIC_STRAPI_URL` | Development / Preview / Production | Strapi エンドポイント URL |
+
+環境変数の操作：
+
+```bash
+vercel env ls                          # 一覧確認
+vercel env add NEXT_PUBLIC_STRAPI_URL  # 追加・更新
+vercel env rm NEXT_PUBLIC_STRAPI_URL   # 削除
+```
+
+> **Strapi Cloud デプロイ後:** Production の `NEXT_PUBLIC_STRAPI_URL` を Strapi Cloud の本番 URL に更新してください。
 
 ### デプロイ前チェック
 
